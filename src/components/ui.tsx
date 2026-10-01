@@ -42,7 +42,7 @@ export const BigButton: React.FC<BigButtonProps> = ({
       {...props}
     >
       {icon && <span className="flex-shrink-0 text-2xl">{icon}</span>}
-      <span className="w-full">{children}</span>
+      <span className="w-full flex flex-col items-center justify-center">{children}</span>
     </button>
   );
 };

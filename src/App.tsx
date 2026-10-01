@@ -373,10 +373,10 @@ export const App: React.FC = () => {
             )}
 
             {/* Picture Tap Buttons (Big icons, high contrast) */}
-            <div className="w-full grid grid-cols-2 gap-3 max-h-[340px] overflow-y-auto p-1">
+            <div className="w-full grid grid-cols-2 gap-3 max-h-[380px] overflow-y-auto p-1">
               <BigButton
                 variant="yellow"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -385,17 +385,18 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <Baby className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_pregnant_or_nursing")}
-                  </span>
+                <Baby
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_pregnant_or_nursing")}
                 </span>
               </BigButton>
 
               <BigButton
                 variant="white"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -404,17 +405,18 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <HeartHandshake className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_girl_child_savings")}
-                  </span>
+                <HeartHandshake
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_girl_child_savings")}
                 </span>
               </BigButton>
 
               <BigButton
                 variant="white"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -423,17 +425,18 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <Banknote className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_monthly_income_support")}
-                  </span>
+                <Banknote
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_monthly_income_support")}
                 </span>
               </BigButton>
 
               <BigButton
                 variant="white"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -442,17 +445,18 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <Flame className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_cooking_fuel")}
-                  </span>
+                <Flame
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_cooking_fuel")}
                 </span>
               </BigButton>
 
               <BigButton
                 variant="white"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -461,17 +465,18 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <Bus className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_free_travel")}
-                  </span>
+                <Bus
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_free_travel")}
                 </span>
               </BigButton>
 
               <BigButton
                 variant="white"
-                className="flex-col h-auto py-4 px-2 min-h-[120px]"
+                className="flex-col items-center justify-center p-4 min-h-[140px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -480,11 +485,12 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                <span className="flex flex-col items-center justify-center text-center w-full">
-                  <Store className="w-10 h-10 stroke-[2.5] mb-2" />
-                  <span className="text-sm sm:text-base font-bold leading-tight">
-                    {t(state.lang, "intent_start_business")}
-                  </span>
+                <Store
+                  className="text-5xl mb-2 block text-center mx-auto stroke-[2.5]"
+                  style={{ width: "2.75rem", height: "2.75rem", fontSize: "2.75rem" }}
+                />
+                <span className="text-base font-black leading-snug text-center">
+                  {t(state.lang, "intent_start_business")}
                 </span>
               </BigButton>
             </div>
