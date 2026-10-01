@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { BigButton, Card, Badge } from "./ui";
 import { t } from "../services/i18n";
 import type { DocKey, EligibilityResult, Lang, Scheme } from "../types";
+import { getWhatsAppShareUrl, buildWhatsAppMessage } from "../services/whatsapp";
 import {
   MapPin,
   PhoneCall,
@@ -9,6 +10,8 @@ import {
   AlertCircle,
   FileText,
   RotateCcw,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface HandoffCardProps {
@@ -26,8 +29,9 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
   discoveryScheme,
   onRestart,
 }) => {
+  const [copied, setCopied] = useState(false);
   const isLikelyEligible = eligibilityResult?.verdict === "LIKELY_ELIGIBLE";
-  const amount = eligibilityResult?.amountInr;
+  const amount = isLikelyEligible ? eligibilityResult?.amountInr : undefined;
   const docs: DocKey[] = eligibilityResult?.documents || [
     "aadhaar",
     "bank_passbook",
@@ -36,23 +40,38 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
   ];
   const needsAccountHelp = eligibilityResult?.needsAccountHelp ?? false;
 
-  // Build WhatsApp share message
-  const buildShareText = (): string => {
-    let msg = "";
-    if (lang === "hi") {
-      msg = `नमस्ते। मुझे वाणी ऐप से सरकारी योजना की जानकारी मिली है:\nयोजना: ${schemeTitle}\n`;
-      if (amount) msg += `संभावित लाभ: ₹${amount}\n`;
-      msg += `आवश्यक दस्तावेज़: आधार कार्ड, बैंक पासबुक, मातृ-शिशु कार्ड (MCP), फोटो।\nकृपया मुझे आंगनवाड़ी में आवेदन करने में मदद करें।`;
-    } else if (lang === "ta") {
-      msg = `வணக்கம். வாணி செயலி மூலம் எனக்கு இந்த அரசு நலத்திட்டம் தெரியவந்துள்ளது:\nதிட்டம்: ${schemeTitle}\n`;
-      if (amount) msg += `உத்தேச உதவித்தொகை: ₹${amount}\n`;
-      msg += `தேவையான ஆவணங்கள்: ஆதார் அட்டை, வங்கி பாஸ்புக், தாய் சேய் அட்டை, புகைப்படம்.\nதயவுசெய்து அங்கன்வாடியில் விண்ணப்பிக்க எனக்கு உதவவும்.`;
-    } else {
-      msg = `Hello. I checked my welfare benefits on Vaani:\nScheme: ${schemeTitle}\n`;
-      if (amount) msg += `Potential Benefit: ₹${amount}\n`;
-      msg += `Required Documents: Aadhaar Card, Bank Passbook, MCP Card, Photo.\nPlease help me apply at the nearest Anganwadi centre.`;
+  const whatsappUrl = getWhatsAppShareUrl({
+    lang,
+    schemeTitle,
+    verdict: eligibilityResult?.verdict,
+    amount,
+    documents: docs,
+  });
+
+  const handleCopy = async () => {
+    try {
+      const rawText = buildWhatsAppMessage({
+        lang,
+        schemeTitle,
+        verdict: eligibilityResult?.verdict,
+        amount,
+        documents: docs,
+      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(rawText);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = rawText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.warn("Failed to copy:", err);
     }
-    return encodeURIComponent(msg);
   };
 
   const docIcons: Record<DocKey, string> = {
@@ -156,21 +175,39 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
           </BigButton>
         </a>
 
-        {/* 3. WhatsApp Share */}
-        <a
-          href={`https://wa.me/?text=${buildShareText()}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full"
-        >
-          <BigButton
-            variant="green"
-            className="w-full text-base sm:text-lg min-h-[58px]"
-            icon={<Share2 className="w-6 h-6 text-white flex-shrink-0" />}
+        {/* 3. WhatsApp Share & Fallback Copy */}
+        <div className="w-full flex flex-col gap-2">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full"
+            aria-label={t(lang, "share_with_worker")}
           >
-            {t(lang, "share_with_worker")}
-          </BigButton>
-        </a>
+            <BigButton
+              variant="green"
+              className="w-full text-base sm:text-lg min-h-[58px]"
+              icon={<Share2 className="w-6 h-6 text-white flex-shrink-0" />}
+            >
+              {t(lang, "share_with_worker")}
+            </BigButton>
+          </a>
+
+          {/* Direct Copy Fallback */}
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="w-full py-2.5 px-3 text-xs sm:text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-2 border-black rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-brutal-sm"
+            aria-label={copied ? t(lang, "copied") : t(lang, "copy_summary")}
+          >
+            {copied ? (
+              <Check className="w-4 h-4 text-green-700" />
+            ) : (
+              <Copy className="w-4 h-4 text-gray-700" />
+            )}
+            <span>{copied ? t(lang, "copied") : t(lang, "copy_summary")}</span>
+          </button>
+        </div>
       </div>
 
       {/* Start Over Button */}

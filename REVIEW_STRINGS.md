@@ -62,7 +62,9 @@ This document lists every user-facing string in **English**, **Hindi (हिन�
 | `doc_photo` | Passport Photos | पासपोर्ट फोटो | பாஸ்போர்ட் அளவு புகைப்படம் |
 | `go_to_anganwadi` | Find Nearest Anganwadi Centre | नजदीकी आंगनवाड़ी केंद्र का पता करें | அருகிலுள்ள அங்கன்வாடி மையம் செல்ல வழிகாட்டுக |
 | `call_181` | Call 181 Women's Helpline | महिला हेल्पलाइन 181 पर कॉल करें | பெண்கள் உதவி எண் 181-ஐ அழைக்க |
-| `share_with_worker` | Send Details to ASHA / Family | आशा दीदी या परिवार को भेजें | ஆஷா பணியாளர் அல்லது குடும்பத்தினருக்கு பகிர்க |
+| `share_with_worker` | Share with ASHA / Family on WhatsApp | ASHA / परिवार के साथ WhatsApp पर साझा करें | ASHA / குடும்பத்துடன் WhatsApp-ல் பகிரவும் |
+| `copy_summary` | Copy details to clipboard | संदेश विवरण कॉपी करें | விவரங்களை நகலெடு |
+| `copied` | Copied to clipboard! | कॉपी हो गया! | நகலெடுக்கப்பட்டது! |
 | `try_again` | Try Saying Again | फिर से बोलें | மீண்டும் சொல்லுங்கள் |
 | `start_again` | Start Over | शुरू से शुरू करें | முதலில் இருந்து தொடங்குக |
 | `yes` | Yes | हाँ | ஆம் |
