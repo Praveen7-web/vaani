@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build && node scripts/check-dist-size.mjs",
     "preview": "vite preview",
-    "test": "node scripts/test-eligibility.mjs && node scripts/test-conversation.mjs && node scripts/test-phase3-security.mjs"
+    "test": "node scripts/test-eligibility.mjs && node scripts/test-conversation.mjs && node scripts/test-phase3-security.mjs && node scripts/test-evaluator.mjs"
   },
   "dependencies": {
     "@google/genai": "2.25.0",
@@ -24,6 +24,7 @@
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
-    "vite": "^5.4.14"
+    "vite": "^5.4.14",
+    "vite-plugin-pwa": "^1.3.0"
   }
 }

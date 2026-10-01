@@ -49,6 +49,28 @@ export default defineConfig(({ mode }) => {
               }
             });
           });
+
+          server.middlewares.use("/api/audit", async (req, res) => {
+            try {
+              const mockReq = { method: req.method, query: {}, body: {} };
+              const mockRes = {
+                status(code: number) {
+                  res.statusCode = code;
+                  return this;
+                },
+                json(data: any) {
+                  res.setHeader("Content-Type", "application/json");
+                  res.end(JSON.stringify(data));
+                },
+              };
+              const { default: auditHandler } = await import("./api/audit");
+              await auditHandler(mockReq, mockRes);
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: err?.message || "Internal Server Error" }));
+            }
+          });
         },
       },
     ],

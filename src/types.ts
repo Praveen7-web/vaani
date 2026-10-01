@@ -72,6 +72,7 @@ export interface EligibilityResult {
   verdict: Verdict;
   reason: ReasonKey;
   amountInr?: number;
+  amount?: number; // Evaluator matrix compatibility alias
   nextSlot?: SlotKey; // set when verdict === 'NEEDS_INFO'
   documents: DocKey[]; // for the Handoff Card
   needsAccountHelp: boolean; // true if she has no bank/post account
