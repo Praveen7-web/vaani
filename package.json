@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build && node scripts/check-dist-size.mjs",
     "preview": "vite preview",
-    "test": "node scripts/test-eligibility.mjs"
+    "test": "node scripts/test-eligibility.mjs && node scripts/test-conversation.mjs"
   },
   "dependencies": {
     "@google/genai": "2.25.0",

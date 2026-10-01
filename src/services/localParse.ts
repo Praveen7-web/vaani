@@ -2,11 +2,11 @@ import type { Lang, Profile, SlotKey } from "../types";
 
 const YES_WORDS = new Set([
   // English
-  "yes", "yeah", "yep", "true", "correct", "sure", "ok", "okay", "have", "i have",
+  "yes", "yeah", "yep", "true", "correct", "sure", "ok", "okay",
   // Hindi
-  "हाँ", "हा", "हाँजी", "जी हाँ", "है", "सही", "हाँ है", "haan", "ha", "ji haan",
+  "हाँ", "हा", "हाँजी", "जी हाँ", "सही", "हाँ है", "haan", "ha", "ji haan",
   // Tamil
-  "ஆம்", "ஆமாம்", "ஆமா", "சரி", "உண்டு", "இருக்கிறது", "இருக்கு", "aam", "aamaam", "aama", "irukku"
+  "ஆம்", "ஆமாம்", "ஆமா", "சரி", "உண்டு", "aam", "aamaam", "aama"
 ]);
 
 const NO_WORDS = new Set([
@@ -64,9 +64,9 @@ export function localParse(
 
   if (!t) return out;
 
-  // Boolean helper
-  const isYes = [...YES_WORDS].some((w) => t.includes(w.toLowerCase()));
+  // Boolean helper - negation takes precedence
   const isNo = [...NO_WORDS].some((w) => t.includes(w.toLowerCase()));
+  const isYes = !isNo && [...YES_WORDS].some((w) => t.includes(w.toLowerCase()));
 
   switch (expectedSlot) {
     case "situation": {
