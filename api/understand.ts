@@ -74,7 +74,15 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { lang, expectedSlot, transcript } = req.body || {};
+  let body = req.body;
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      return res.status(400).json({ error: "Malformed JSON payload" });
+    }
+  }
+  const { lang, expectedSlot, transcript } = body || {};
 
   // Reject invalid or oversized transcript (strictly <= 500 chars)
   if (!transcript || typeof transcript !== "string" || transcript.length > 500) {
