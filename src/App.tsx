@@ -28,6 +28,13 @@ import {
   HelpCircle,
   PlayCircle,
   Radio,
+  Baby,
+  HeartHandshake,
+  Banknote,
+  Flame,
+  Bus,
+  Store,
+  FileText,
 } from "lucide-react";
 
 export const App: React.FC = () => {
@@ -366,9 +373,10 @@ export const App: React.FC = () => {
             )}
 
             {/* Picture Tap Buttons (Big icons, high contrast) */}
-            <div className="w-full grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto p-1">
+            <div className="w-full grid grid-cols-2 gap-3 max-h-[340px] overflow-y-auto p-1">
               <BigButton
                 variant="yellow"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -377,11 +385,17 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                🤰 {t(state.lang, "intent_pregnant_or_nursing")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <Baby className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_pregnant_or_nursing")}
+                  </span>
+                </span>
               </BigButton>
 
               <BigButton
                 variant="white"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -390,11 +404,17 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                👧 {t(state.lang, "intent_girl_child_savings")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <HeartHandshake className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_girl_child_savings")}
+                  </span>
+                </span>
               </BigButton>
 
               <BigButton
                 variant="white"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -403,11 +423,17 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                🪙 {t(state.lang, "intent_monthly_income_support")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <Banknote className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_monthly_income_support")}
+                  </span>
+                </span>
               </BigButton>
 
               <BigButton
                 variant="white"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -416,11 +442,17 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                ⛽ {t(state.lang, "intent_cooking_fuel")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <Flame className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_cooking_fuel")}
+                  </span>
+                </span>
               </BigButton>
 
               <BigButton
                 variant="white"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -429,11 +461,17 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                🚌 {t(state.lang, "intent_free_travel")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <Bus className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_free_travel")}
+                  </span>
+                </span>
               </BigButton>
 
               <BigButton
                 variant="white"
+                className="flex-col h-auto py-4 px-2 min-h-[120px]"
                 onClick={() =>
                   handlePropose(
                     "intent",
@@ -442,7 +480,12 @@ export const App: React.FC = () => {
                   )
                 }
               >
-                🏪 {t(state.lang, "intent_start_business")}
+                <span className="flex flex-col items-center justify-center text-center w-full">
+                  <Store className="w-10 h-10 stroke-[2.5] mb-2" />
+                  <span className="text-sm sm:text-base font-bold leading-tight">
+                    {t(state.lang, "intent_start_business")}
+                  </span>
+                </span>
               </BigButton>
             </div>
           </div>
@@ -828,7 +871,19 @@ export const App: React.FC = () => {
               </div>
 
               <Card className="w-full text-center">
-                <span className="text-3xl block mb-2" aria-hidden="true">📜</span>
+                <div className="flex justify-center mb-2">
+                  {scheme.intents.includes("pregnant_or_nursing") ? (
+                    <Baby className="w-10 h-10 stroke-[2.5] mb-2" />
+                  ) : scheme.intents.includes("girl_child_savings") || scheme.intents.includes("girl_education") ? (
+                    <HeartHandshake className="w-10 h-10 stroke-[2.5] mb-2" />
+                  ) : scheme.intents.includes("monthly_income_support") ? (
+                    <Banknote className="w-10 h-10 stroke-[2.5] mb-2" />
+                  ) : scheme.intents.includes("cooking_fuel") ? (
+                    <Flame className="w-10 h-10 stroke-[2.5] mb-2" />
+                  ) : (
+                    <FileText className="w-10 h-10 stroke-[2.5] mb-2" />
+                  )}
+                </div>
                 <h1 className="text-2xl font-extrabold mb-3">{scheme.name}</h1>
                 <p className="text-lg font-semibold text-gray-800 mb-3">
                   {scheme.benefit}

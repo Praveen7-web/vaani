@@ -37,9 +37,10 @@ let failed = 0;
 console.log("Running AI Evaluator Compliance Suite...\n");
 for (const tc of evaluatorMatrix) {
   const res = evaluate(tc.profile);
-  const pass = res.verdict === tc.expectedVerdict && (res.amount || 0) === tc.expectedAmount;
+  const actualAmount = res.amount ?? res.amountInr ?? 0;
+  const pass = res.verdict === tc.expectedVerdict && actualAmount === tc.expectedAmount;
   if (!pass) {
-    console.error(`FAIL: ${tc.desc} -> Got ${res.verdict} (₹${res.amount})`);
+    console.error(`FAIL: ${tc.desc} -> Got ${res.verdict} (₹${actualAmount})`);
     failed++;
   } else {
     console.log(`PASS: ${tc.desc}`);
