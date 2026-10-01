@@ -1,0 +1,21 @@
+{
+  "scheme": "PMMVY",
+  "sourceUrl": "https://pmmvy.wcd.gov.in/",
+  "lastVerified": "2026-10-01",
+  "minAgeYears": 19,
+  "applyWindowDays": 270,
+  "qualifyingCards": [
+    "e-Shram",
+    "Ayushman Bharat PMJAY",
+    "BPL Ration Card",
+    "MGNREGA Job Card",
+    "Kisan Samman Nidhi",
+    "SC/ST Certificate",
+    "Disability Certificate"
+  ],
+  "benefits": [
+    { "childOrder": "first", "amountInr": 5000 },
+    { "childOrder": "second", "requiresGirl": true, "amountInr": 6000 }
+  ],
+  "documents": ["aadhaar", "bank_passbook", "mother_child_card", "photo"]
+}
