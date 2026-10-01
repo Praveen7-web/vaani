@@ -71,3 +71,14 @@ This document lists every user-facing string in **English**, **Hindi (हिन�
 | `listening` | Listening... speak now | सुन रही हूँ... अब बोलिए | கேட்கிறேன்... இப்போது பேசுங்கள் |
 | `processing` | Understanding... | समझ रही हूँ... | புரிந்துகொள்கிறேன்... |
 | `offline_notice` | Offline mode active | ऑफ़लाइन मोड सक्रिय | ஆஃப்லைன் முறை செயல்படுகிறது |
+| `private_badge` | 100% Private | 100% निजी व सुरक्षित | 100% தனிப்பட்டது |
+| `auto_speak_next` | Auto-Speak Next ❯ | आगे बोलें ❯ | அடுத்ததை பேசுக ❯ |
+| `demo_badge` | Demo | डेमो | டெமோ |
+| `select_demo_scenario` | Select Demo Scenario | डेमो स्थिति चुनें | டெமோ தேர்வு |
+| `handoff_card_title` | Last-Mile Handoff Card | अंतिम-मील सहायता कार्ड | நேரடி உதவி அட்டை |
+| `you_may_qualify` | You may likely qualify | आपको मिलने की संभावना है | உங்களுக்கு கிடைக்க வாய்ப்புள்ளது |
+| `documents_to_carry` | Documents to Carry: | साथ ले जाने वाले ज़रूरी दस्तावेज़: | கொண்டு செல்ல வேண்டிய ஆவணங்கள்: |
+| `about` | About Vaani | वाणी के बारे में | வாணி பற்றி |
+| `back` | Back | वापस | பின்னே |
+| `confirm` | Confirm | पुष्टि करें | உறுதி செய் |
+| `change_answer` | Change | बदलें | மாற்று |

@@ -15,17 +15,18 @@ export interface IWindow extends Window {
   webkitSpeechRecognition?: any;
 }
 
-export function getBcp47(lang: Lang): string {
-  switch (lang) {
-    case "hi":
-      return "hi-IN";
-    case "ta":
-      return "ta-IN";
-    case "en":
-    default:
-      return "en-IN";
-  }
+const localeMap: Record<Lang, string> = {
+  hi: "hi-IN",
+  ta: "ta-IN",
+  en: "en-IN",
+};
+
+export function getVoiceLocale(lang: Lang): string {
+  return localeMap[lang] || "en-IN";
 }
+
+// Backward compatibility alias
+export const getBcp47 = getVoiceLocale;
 
 export function isSpeechRecognitionSupported(): boolean {
   if (typeof window === "undefined") return false;
@@ -45,7 +46,7 @@ export function createSpeechRecognizer(
   const SpeechRec = win.SpeechRecognition || win.webkitSpeechRecognition;
   const recognizer = new SpeechRec();
 
-  recognizer.lang = getBcp47(lang);
+  recognizer.lang = getVoiceLocale(lang);
   recognizer.continuous = false;
   recognizer.interimResults = false;
   recognizer.maxAlternatives = 1;
@@ -78,14 +79,17 @@ export function speakText(
   window.speechSynthesis.cancel(); // Stop ongoing speech
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = getBcp47(lang);
+  const locale = getVoiceLocale(lang);
+  utterance.lang = locale;
   utterance.rate = 0.9; // Slightly slower, clearer for rural users
 
-  // Try to find native voice
+  // Try to find native voice matching requested locale
   const voices = window.speechSynthesis.getVoices();
-  const bcp = getBcp47(lang);
   const matchedVoice = voices.find(
-    (v) => v.lang === bcp || v.lang.replace("_", "-").startsWith(lang)
+    (v) =>
+      v.lang === locale ||
+      v.lang.toLowerCase() === locale.toLowerCase() ||
+      v.lang.replace("_", "-").toLowerCase().startsWith(lang)
   );
   if (matchedVoice) {
     utterance.voice = matchedVoice;

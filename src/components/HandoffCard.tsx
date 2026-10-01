@@ -70,7 +70,7 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
           <Badge
             variant={isLikelyEligible ? "green" : "yellow"}
             icon={<FileText className="w-4 h-4" />}
-            label="Last-Mile Handoff Card"
+            label={t(lang, "handoff_card_title")}
           />
         </div>
 
@@ -84,21 +84,12 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
               ₹{amount.toLocaleString("en-IN")}
             </span>
             <span className="text-xs font-extrabold text-gray-700">
-              {lang === "hi"
-                ? "आपको मिलने की संभावना है"
-                : lang === "ta"
-                ? "உங்களுக்கு கிடைக்க வாய்ப்புள்ளது"
-                : "You may likely qualify"}
+              {t(lang, "you_may_qualify")}
             </span>
           </div>
         ) : (
           <p className="text-base font-bold text-gray-800 my-2">
-            {discoveryScheme?.benefit ||
-              (lang === "hi"
-                ? "अपनी पात्रता की पुष्टि के लिए अपनी आंगनवाड़ी दीदी से मिलें।"
-                : lang === "ta"
-                ? "உங்கள் தகுதியை உறுதிப்படுத்த அங்கன்வாடி பணியாளரை அணுகவும்."
-                : "Please consult your Anganwadi worker to confirm eligibility.")}
+            {discoveryScheme?.benefit || t(lang, "consult_worker")}
           </p>
         )}
 
@@ -117,13 +108,7 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
       <Card className="w-full p-4">
         <h2 className="text-base font-extrabold mb-3 flex items-center gap-1.5">
           <span>📋</span>
-          <span>
-            {lang === "hi"
-              ? "साथ ले जाने वाले ज़रूरी दस्तावेज़:"
-              : lang === "ta"
-              ? "கொண்டு செல்ல வேண்டிய ஆவணங்கள்:"
-              : "Documents to Carry:"}
-          </span>
+          <span>{t(lang, "documents_to_carry")}</span>
         </h2>
         <div className="grid grid-cols-2 gap-2">
           {docs.map((d) => (

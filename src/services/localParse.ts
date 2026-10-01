@@ -2,16 +2,16 @@ import type { Lang, Profile, SlotKey } from "../types";
 
 const YES_WORDS = new Set([
   // English
-  "yes", "yeah", "yep", "true", "correct", "sure", "ok", "okay",
+  "yes", "yeah", "yep", "true", "correct", "sure", "ok", "okay", "have", "i have",
   // Hindi
-  "हाँ", "हा", "हाँजी", "जी हाँ", "सही", "हाँ है", "haan", "ha", "ji haan",
+  "हाँ", "हा", "हाँजी", "जी हाँ", "सही", "हाँ है", "haan", "ha", "ji haan", "उपलब्ध", "है",
   // Tamil
-  "ஆம்", "ஆமாம்", "ஆமா", "சரி", "உண்டு", "aam", "aamaam", "aama"
+  "ஆம்", "ஆமாம்", "ஆமா", "சரி", "உண்டு", "உள்ளது", "இருக்கிறது", "aam", "aamaam", "aama", "ullathu"
 ]);
 
 const NO_WORDS = new Set([
   // English
-  "no", "nope", "not", "false", "neither", "don't have", "no account",
+  "no", "nope", "not", "false", "neither", "don't have", "no account", "no job", "none",
   // Hindi
   "नहीं", "ना", "गलत", "नहीं है", "nahi", "na", "nahin", "nahi hai",
   // Tamil
@@ -71,13 +71,15 @@ export function localParse(
   switch (expectedSlot) {
     case "situation": {
       if (
-        t.includes("गर्भवती") || t.includes("pregnant") || t.includes("कர்ப்பம்") ||
+        t.includes("गर्भवती") || t.includes("pregnant") || t.includes("கர்ப்ப") ||
+        t.includes("கர்ப்பமாக") || t.includes("கர்ப்பிணி") || t.includes("கருவுற்ற") ||
         t.includes("पेट से") || t.includes("expecting")
       ) {
         out.situation = "pregnant";
       } else if (
         t.includes("नवजात") || t.includes("newborn") || t.includes("baby") ||
-        t.includes("बच्चा हुआ") || t.includes("பச்சிளங்குழந்தை") || t.includes("குழந்தை பிறந்தது")
+        t.includes("बच्चा हुआ") || t.includes("பச்சிளங்குழந்தை") || t.includes("குழந்தை பிறந்தது") ||
+        t.includes("குழந்தை உள்ளது") || t.includes("குழந்தை பெற்ற")
       ) {
         out.situation = "newborn_mother";
       } else if (isNo || t.includes("neither") || t.includes("दोनों नहीं") || t.includes("இல்லை")) {
@@ -103,11 +105,20 @@ export function localParse(
     }
 
     case "childOrder": {
-      if (t.includes("first") || t.includes("1st") || t.includes("पहला") || t.includes("முதல்") || t === "1") {
+      if (
+        t.includes("first") || t.includes("1st") || t.includes("पहला") ||
+        t.includes("முதல்") || t.includes("முதலாவது") || t === "1"
+      ) {
         out.childOrder = "first";
-      } else if (t.includes("second") || t.includes("2nd") || t.includes("दूसरा") || t.includes("இரண்டாவது") || t === "2") {
+      } else if (
+        t.includes("second") || t.includes("2nd") || t.includes("दूसरा") ||
+        t.includes("இரண்டாவது") || t.includes("இரண்டாம்") || t === "2"
+      ) {
         out.childOrder = "second";
-      } else if (t.includes("third") || t.includes("later") || t.includes("तीसरा") || t.includes("மூன்றாவது") || t.includes("بعد")) {
+      } else if (
+        t.includes("third") || t.includes("later") || t.includes("तीसरा") ||
+        t.includes("மூன்றாவது") || t.includes("மூன்றாம்") || t.includes("3rd") || t === "3"
+      ) {
         out.childOrder = "later";
       }
       break;
@@ -123,54 +134,104 @@ export function localParse(
     }
 
     case "govtEmployee": {
-      if (isYes && !isNo) out.govtEmployee = true;
-      else if (isNo && !isYes) out.govtEmployee = false;
+      // Government employment check
+      const hasGovtMention = t.includes("govt") || t.includes("सरकारी") || t.includes("அரசு");
+      if (hasGovtMention && isNo) {
+        out.govtEmployee = false;
+      } else if (hasGovtMention && (isYes || t.includes("नौकरी है") || t.includes("வேலை உண்டு"))) {
+        out.govtEmployee = true;
+      } else if (isYes && !isNo) {
+        out.govtEmployee = true;
+      } else if (isNo && !isYes) {
+        out.govtEmployee = false;
+      }
       break;
     }
 
     case "hasQualifyingCard": {
-      if (isYes && !isNo) out.hasQualifyingCard = true;
-      else if (isNo && !isYes) out.hasQualifyingCard = false;
+      const hasCardMention = t.includes("card") || t.includes("कार्ड") || t.includes("கார்டு") ||
+        t.includes("shram") || t.includes("श्रम") || t.includes("ration") || t.includes("ரேஷன்") ||
+        t.includes("ayushman") || t.includes("ஆயுஷ்மான்") || t.includes("mgnrega") || t.includes("நரேகா");
+      if (hasCardMention && !isNo) {
+        out.hasQualifyingCard = true;
+      } else if (isYes && !isNo) {
+        out.hasQualifyingCard = true;
+      } else if (isNo && !isYes) {
+        out.hasQualifyingCard = false;
+      }
       break;
     }
 
     case "hasBankOrPostAccount": {
-      if (isYes && !isNo) out.hasBankOrPostAccount = true;
-      else if (isNo && !isYes) out.hasBankOrPostAccount = false;
+      const hasAccountMention = t.includes("bank") || t.includes("बैंक") || t.includes("வங்கி") ||
+        t.includes("khata") || t.includes("खाता") || t.includes("கணக்கு") || t.includes("பாஸ்புக்") ||
+        t.includes("passbook") || t.includes("post") || t.includes("डाकघर");
+      if (hasAccountMention && !isNo) {
+        out.hasBankOrPostAccount = true;
+      } else if (isYes && !isNo) {
+        out.hasBankOrPostAccount = true;
+      } else if (isNo && !isYes) {
+        out.hasBankOrPostAccount = false;
+      }
       break;
     }
 
     case "state": {
-      if (t.includes("tamil") || t.includes("தமிழ்நாடு") || t.includes("tn")) out.state = "TN";
-      else if (t.includes("telangana") || t.includes("தெலுங்கானா") || t.includes("తెలంగాణ") || t.includes("ts")) out.state = "TS";
-      else if (t.includes("karnataka") || t.includes("ಕರ್ನಾಟಕ") || t.includes("ka")) out.state = "KA";
-      else if (t.includes("maharashtra") || t.includes("महाराष्ट्र") || t.includes("mh")) out.state = "MH";
-      else if (t.includes("madhya") || t.includes("मध्य") || t.includes("mp")) out.state = "MP";
-      else if (t.includes("bengal") || t.includes("पश्चिम") || t.includes("wb")) out.state = "WB";
-      else if (t.includes("uttar") || t.includes("उत्तर") || t.includes("up")) out.state = "UP";
-      else if (t.includes("rajasthan") || t.includes("राजस्थान") || t.includes("rj")) out.state = "RJ";
-      else if (t.includes("andhra") || t.includes("ఆంధ్ర") || t.includes("ap")) out.state = "AP";
-      else if (t.includes("assam") || t.includes("असम") || t.includes("as")) out.state = "AS";
-      else if (t.includes("other") || t.includes("अन्य") || t.includes("மற்ற")) out.state = "OTHER";
+      if (t.includes("tamil") || t.includes("तमिलनाडु") || t.includes("தமிழ்நாடு") || t.includes("தமிழ்") || t.includes("tn")) out.state = "TN";
+      else if (t.includes("telangana") || t.includes("तेलंगाना") || t.includes("தெலுங்கானா") || t.includes("தெலங்கானா") || t.includes("తెలంగాణ") || t.includes("ts")) out.state = "TS";
+      else if (t.includes("karnataka") || t.includes("कर्नाटक") || t.includes("கர்நாடகா") || t.includes("ಕರ್ನಾಟಕ") || t.includes("ka")) out.state = "KA";
+      else if (t.includes("maharashtra") || t.includes("महाराष्ट्र") || t.includes("மகாராஷ்டிரா") || t.includes("mh")) out.state = "MH";
+      else if (t.includes("madhya") || t.includes("मध्य") || t.includes("மத்திய") || t.includes("mp")) out.state = "MP";
+      else if (t.includes("bengal") || t.includes("पश्चिम") || t.includes("बंगाल") || t.includes("வங்கம்") || t.includes("wb")) out.state = "WB";
+      else if (t.includes("uttar") || t.includes("उत्तर") || t.includes("உத்தர") || t.includes("up")) out.state = "UP";
+      else if (t.includes("rajasthan") || t.includes("राजस्थान") || t.includes("ராஜஸ்தான்") || t.includes("rj")) out.state = "RJ";
+      else if (t.includes("andhra") || t.includes("आंध्र") || t.includes("ஆந்திரா") || t.includes("ఆంధ్ర") || t.includes("ap")) out.state = "AP";
+      else if (t.includes("assam") || t.includes("असम") || t.includes("அஸ்ஸாம்") || t.includes("as")) out.state = "AS";
+      else if (t.includes("other") || t.includes("अन्य") || t.includes("மற்ற") || t.includes("வேற")) out.state = "OTHER";
       break;
     }
 
     case "intent": {
-      if (t.includes("pregnant") || t.includes("गर्भवती") || t.includes("கர்ப்பிணி") || t.includes("maternity") || t.includes("बच्चा")) {
+      if (
+        t.includes("pregnant") || t.includes("pregnancy") || t.includes("गर्भ") ||
+        t.includes("maternity") || t.includes("मातृत्व") || t.includes("बच्चा") ||
+        t.includes("கர்ப்ப") || t.includes("மகப்பேறு") || t.includes("மாதா")
+      ) {
         out.intent = "pregnant_or_nursing";
-      } else if (t.includes("savings") || t.includes("sukanya") || t.includes("सुकन्या") || t.includes("செல்வமகள்")) {
+      } else if (
+        t.includes("savings") || t.includes("sukanya") || t.includes("सुकन्या") ||
+        t.includes("செல்வமகள்") || t.includes("சேமிப்பு") || t.includes("girl child")
+      ) {
         out.intent = "girl_child_savings";
-      } else if (t.includes("education") || t.includes("पढ़ाई") || t.includes("படிப்பு") || t.includes("school")) {
+      } else if (
+        t.includes("education") || t.includes("पढ़ाई") || t.includes("படிப்பு") ||
+        t.includes("கல்வி") || t.includes("school") || t.includes("penn")
+      ) {
         out.intent = "girl_education";
-      } else if (t.includes("monthly") || t.includes("पैसे") || t.includes("உரிமைத்தொகை") || t.includes("income")) {
+      } else if (
+        t.includes("monthly") || t.includes("पैसे") || t.includes("உரிமைத்தொகை") ||
+        t.includes("உதவித்தொகை") || t.includes("income") || t.includes("सहायता राशि")
+      ) {
         out.intent = "monthly_income_support";
-      } else if (t.includes("gas") || t.includes("गैस") || t.includes("சிலிண்டர்") || t.includes("ujjwala")) {
+      } else if (
+        t.includes("gas") || t.includes("गैस") || t.includes("சிலிண்டர்") ||
+        t.includes("காஸ்") || t.includes("ujjwala") || t.includes("उज्ज्वला")
+      ) {
         out.intent = "cooking_fuel";
-      } else if (t.includes("bus") || t.includes("बस") || t.includes("பேருந்து") || t.includes("travel")) {
+      } else if (
+        t.includes("bus") || t.includes("बस") || t.includes("பேருந்து") ||
+        t.includes("பயணம்") || t.includes("travel")
+      ) {
         out.intent = "free_travel";
-      } else if (t.includes("business") || t.includes("व्यापार") || t.includes("தொழில்") || t.includes("dukaan")) {
+      } else if (
+        t.includes("business") || t.includes("व्यापार") || t.includes("தொழில்") ||
+        t.includes("dukaan") || t.includes("दुकान") || t.includes("வியாபாரம்")
+      ) {
         out.intent = "start_business";
-      } else if (t.includes("shg") || t.includes("samuh") || t.includes("समूह") || t.includes("குழு")) {
+      } else if (
+        t.includes("shg") || t.includes("samuh") || t.includes("समूह") ||
+        t.includes("குழு") || t.includes("சுயஉதவி")
+      ) {
         out.intent = "shg_livelihood";
       }
       break;

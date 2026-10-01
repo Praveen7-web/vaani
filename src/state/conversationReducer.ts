@@ -273,7 +273,7 @@ export function conversationReducer(
       const scenario = action.payload;
       return {
         ...initialState,
-        lang: scenario.lang,
+        lang: state.lang, // Always preserve user's authoritative chosen language
         step: "ASK_INTENT",
         currentSlot: "intent",
         demoMode: true,

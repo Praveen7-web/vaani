@@ -14,7 +14,13 @@ import {
   speakText,
   stopSpeaking,
 } from "./services/voice";
-import { DEMO_SCENARIOS, type DemoScenario } from "./data/demoScenarios";
+import {
+  DEMO_SCENARIOS,
+  type DemoScenario,
+  getScenarioTitle,
+  getScenarioSubtitle,
+  getStepUtterance,
+} from "./data/demoScenarios";
 import type { StateCode, Situation, ChildOrder } from "./types";
 import {
   RotateCcw,
@@ -105,8 +111,10 @@ export const App: React.FC = () => {
       case "DISCOVERY_CARDS": {
         const scheme = state.discoveryList[state.discoveryIndex];
         if (scheme) {
+          const schemeName = t(state.lang, `scheme_${scheme.id}_name`) || scheme.name;
+          const schemeBenefit = t(state.lang, `scheme_${scheme.id}_benefit`) || scheme.benefit;
           speakCurrentPrompt(
-            `${scheme.name}. ${scheme.benefit}. ${t(state.lang, "ask_worker_to_confirm")}`
+            `${schemeName}. ${schemeBenefit}. ${t(state.lang, "ask_worker_to_confirm")}`
           );
         }
         break;
@@ -228,12 +236,51 @@ export const App: React.FC = () => {
     });
   };
 
-  // Demo step simulator
+  // Demo step simulator (language-neutral)
   const stepDemo = () => {
     if (!state.demoScenario) return;
+
+    if (state.step === "GREETING_AND_SAFETY") {
+      dispatch({ type: "ACKNOWLEDGE_GREETING" });
+      return;
+    }
+
+    if (state.step === "CONFIRM_SLOT") {
+      dispatch({ type: "CONFIRM_SLOT_YES" });
+      return;
+    }
+
+    if (state.step === "PMMVY_RESULT") {
+      dispatch({ type: "VIEW_COMPANION_SCHEMES" });
+      return;
+    }
+
+    if (state.step === "DISCOVERY_CARDS") {
+      if (state.discoveryIndex + 1 < state.discoveryList.length) {
+        dispatch({ type: "NEXT_DISCOVERY_CARD" });
+      } else {
+        dispatch({ type: "GO_TO_HANDOFF" });
+      }
+      return;
+    }
+
+    if (state.step === "HANDOFF_CARD") {
+      const evalRes = evaluate(state.profile);
+      if (evalRes.verdict === "LIKELY_ELIGIBLE") {
+        speakCurrentPrompt(
+          t(state.lang, "result_likely_eligible", { amount: evalRes.amountInr || 5000 })
+        );
+      } else {
+        speakCurrentPrompt(t(state.lang, "ask_worker_to_confirm"));
+      }
+      return;
+    }
+
+    // Question step: find matching step and extract utterance in chosen language
     const currentStep = state.demoScenario.steps.find((s) => s.slot === state.currentSlot);
     if (currentStep) {
-      handleTranscript(currentStep.utterance);
+      const utterance = getStepUtterance(currentStep, state.lang);
+      handleTranscript(utterance);
     }
   };
 
@@ -250,7 +297,7 @@ export const App: React.FC = () => {
           <Badge
             variant="green"
             icon={<ShieldCheck className="w-4 h-4" />}
-            label="100% Private"
+            label={t(state.lang, "private_badge")}
           />
           {state.step !== "LANGUAGE_PICK" && (
             <button
@@ -271,14 +318,14 @@ export const App: React.FC = () => {
         <div className="bg-[#FFD600] border-2 border-black rounded-2xl p-2.5 my-2 shadow-brutal-sm flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-black truncate">
             <Radio className="w-4 h-4 text-red-600 animate-pulse flex-shrink-0" />
-            <span className="truncate">Demo: {state.demoScenario.title}</span>
+            <span className="truncate">{t(state.lang, "demo_badge")}: {getScenarioTitle(state.demoScenario, state.lang)}</span>
           </div>
           <button
             type="button"
             onClick={stepDemo}
             className="bg-black text-white px-3 py-1 rounded-xl text-xs font-extrabold flex-shrink-0 shadow-brutal-pressed active:scale-95 cursor-pointer"
           >
-            Auto-Speak Next ❯
+            {t(state.lang, "auto_speak_next")}
           </button>
         </div>
       )}
@@ -890,9 +937,11 @@ export const App: React.FC = () => {
                     <FileText className="w-10 h-10 stroke-[2.5] mb-2" />
                   )}
                 </div>
-                <h1 className="text-2xl font-extrabold mb-3">{scheme.name}</h1>
+                <h1 className="text-2xl font-extrabold mb-3">
+                  {t(state.lang, `scheme_${scheme.id}_name`) || scheme.name}
+                </h1>
                 <p className="text-lg font-semibold text-gray-800 mb-3">
-                  {scheme.benefit}
+                  {t(state.lang, `scheme_${scheme.id}_benefit`) || scheme.benefit}
                 </p>
                 <div className="inline-block bg-yellow-100 border-2 border-black px-3 py-1 rounded-xl text-xs font-bold mt-1">
                   {t(state.lang, "ask_worker_to_confirm")}
@@ -923,8 +972,8 @@ export const App: React.FC = () => {
 
           const title =
             state.profile.intent === "pregnant_or_nursing"
-              ? "Pradhan Mantri Matru Vandana Yojana (PMMVY)"
-              : activeDiscovery?.name || "Welfare Support";
+              ? t(state.lang, "scheme_pmmvy_name")
+              : (activeDiscovery ? (t(state.lang, `scheme_${activeDiscovery.id}_name`) || activeDiscovery.name) : t(state.lang, "scheme_pmmvy_name"));
 
           return (
             <HandoffCard
@@ -991,7 +1040,7 @@ export const App: React.FC = () => {
               className="underline font-bold text-amber-900 flex items-center gap-1 hover:text-black cursor-pointer"
             >
               <PlayCircle className="w-3.5 h-3.5" />
-              Demo Mode
+              {t(state.lang, "demo_badge")}
             </button>
 
             <button
@@ -1000,7 +1049,7 @@ export const App: React.FC = () => {
               className="underline font-bold text-gray-800 flex items-center gap-0.5 hover:text-black cursor-pointer"
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              About
+              {t(state.lang, "about")}
             </button>
           </div>
         </div>
@@ -1027,7 +1076,7 @@ export const App: React.FC = () => {
       </footer>
 
       {/* About Modal */}
-      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} lang={state.lang} />
 
       {/* Demo Mode Selection Modal */}
       {isDemoModalOpen && (
@@ -1036,7 +1085,7 @@ export const App: React.FC = () => {
             <div className="flex items-center justify-between mb-3 border-b-2 border-black pb-2">
               <h2 className="text-xl font-black flex items-center gap-1.5">
                 <PlayCircle className="w-5 h-5 text-amber-600" />
-                Select Demo Scenario
+                {t(state.lang, "select_demo_scenario")}
               </h2>
               <button
                 type="button"
@@ -1048,7 +1097,7 @@ export const App: React.FC = () => {
             </div>
 
             <p className="text-xs font-bold text-gray-700 mb-3">
-              Simulates voice responses using pre-scripted natural utterances. Runs 100% offline without mic, internet, or API key.
+              {t(state.lang, "demo_disclaimer")}
             </p>
 
             <div className="flex flex-col gap-2.5">
@@ -1062,8 +1111,8 @@ export const App: React.FC = () => {
                   }}
                   className="text-left bg-white border-2 border-black rounded-2xl p-3 shadow-brutal-sm hover:bg-yellow-50 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
                 >
-                  <p className="font-extrabold text-sm text-black">{sc.title}</p>
-                  <p className="text-xs text-gray-600 font-semibold mt-0.5">{sc.subtitle}</p>
+                  <p className="font-extrabold text-sm text-black">{getScenarioTitle(sc, state.lang)}</p>
+                  <p className="text-xs text-gray-600 font-semibold mt-0.5">{getScenarioSubtitle(sc, state.lang)}</p>
                 </button>
               ))}
             </div>
