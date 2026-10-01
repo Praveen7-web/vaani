@@ -2,6 +2,7 @@ import type { Lang, Profile, Scheme, SlotKey, StateCode, Intent } from "../types
 import { evaluate } from "../services/eligibility";
 import { matchSchemes } from "../services/schemeRouter";
 import { isSpeechRecognitionSupported } from "../services/voice";
+import type { DemoScenario } from "../data/demoScenarios";
 
 export type Step =
   | "LANGUAGE_PICK"
@@ -12,6 +13,7 @@ export type Step =
   | "CONFIRM_SLOT"
   | "PMMVY_RESULT"
   | "DISCOVERY_CARDS"
+  | "HANDOFF_CARD"
   | "DONE";
 
 export interface PendingSlot {
@@ -25,7 +27,7 @@ export interface ConversationState {
   step: Step;
   profile: Partial<Profile>;
   pendingSlot: PendingSlot | null;
-  returnStep: Step | null; // where to go back if confirm is rejected
+  returnStep: Step | null;
   currentSlot: SlotKey | null;
   discoveryIndex: number;
   discoveryList: Scheme[];
@@ -34,6 +36,10 @@ export interface ConversationState {
   isListening: boolean;
   transcript: string;
   speechSupported: boolean;
+  aiStatus: "offline" | "live" | "evaluating";
+  demoMode: boolean;
+  demoScenario: DemoScenario | null;
+  demoStepIndex: number;
 }
 
 export type ConversationAction =
@@ -44,9 +50,12 @@ export type ConversationAction =
   | { type: "CONFIRM_SLOT_NO" }
   | { type: "NEXT_DISCOVERY_CARD" }
   | { type: "VIEW_COMPANION_SCHEMES" }
+  | { type: "GO_TO_HANDOFF" }
   | { type: "START_OVER" }
   | { type: "SET_LISTENING"; payload: boolean }
   | { type: "SET_TRANSCRIPT"; payload: string }
+  | { type: "SET_AI_STATUS"; payload: "offline" | "live" | "evaluating" }
+  | { type: "START_DEMO"; payload: DemoScenario }
   | { type: "RECORD_FAILED_ATTEMPT"; payload: string };
 
 export const initialState: ConversationState = {
@@ -63,6 +72,10 @@ export const initialState: ConversationState = {
   isListening: false,
   transcript: "",
   speechSupported: isSpeechRecognitionSupported(),
+  aiStatus: "offline",
+  demoMode: false,
+  demoScenario: null,
+  demoStepIndex: 0,
 };
 
 export function conversationReducer(
@@ -129,7 +142,6 @@ export function conversationReducer(
       // 2. After confirming STATE
       if (answeredKey === "state") {
         if (updatedProfile.intent === "pregnant_or_nursing") {
-          // Check PMMVY eligibility evaluation
           const evalResult = evaluate(updatedProfile);
           if (evalResult.verdict === "NEEDS_INFO" && evalResult.nextSlot) {
             return {
@@ -153,7 +165,7 @@ export function conversationReducer(
           const matched = matchSchemes(
             updatedProfile.intent as Intent,
             updatedProfile.state as StateCode,
-            { showUnverified: false }
+            { showUnverified: state.demoMode }
           ).filter((s) => !s.deepFlow);
 
           if (matched.length > 0) {
@@ -171,7 +183,7 @@ export function conversationReducer(
               ...state,
               profile: updatedProfile,
               pendingSlot: null,
-              step: "DONE",
+              step: "HANDOFF_CARD",
               currentSlot: null,
             };
           }
@@ -212,7 +224,7 @@ export function conversationReducer(
       const companion = matchSchemes(
         "pregnant_or_nursing",
         state.profile.state,
-        { showUnverified: false }
+        { showUnverified: state.demoMode }
       ).filter((s) => !s.deepFlow);
 
       if (companion.length > 0) {
@@ -225,7 +237,7 @@ export function conversationReducer(
       }
       return {
         ...state,
-        step: "DONE",
+        step: "HANDOFF_CARD",
       };
     }
 
@@ -239,7 +251,35 @@ export function conversationReducer(
       }
       return {
         ...state,
-        step: "DONE",
+        step: "HANDOFF_CARD",
+      };
+    }
+
+    case "GO_TO_HANDOFF": {
+      return {
+        ...state,
+        step: "HANDOFF_CARD",
+      };
+    }
+
+    case "SET_AI_STATUS": {
+      return {
+        ...state,
+        aiStatus: action.payload,
+      };
+    }
+
+    case "START_DEMO": {
+      const scenario = action.payload;
+      return {
+        ...initialState,
+        lang: scenario.lang,
+        step: "ASK_INTENT",
+        currentSlot: "intent",
+        demoMode: true,
+        demoScenario: scenario,
+        demoStepIndex: 0,
+        forceTaps: false,
       };
     }
 

@@ -1,17 +1,20 @@
-import React, { useReducer, useEffect, useRef, useCallback } from "react";
+import React, { useReducer, useEffect, useRef, useCallback, useState } from "react";
 import {
   conversationReducer,
   initialState,
 } from "./state/conversationReducer";
 import { BigButton, Card, MicButton, Badge } from "./components/ui";
+import { HandoffCard } from "./components/HandoffCard";
+import { AboutModal } from "./components/AboutModal";
 import { t } from "./services/i18n";
-import { localParse } from "./services/localParse";
+import { understandSpeech } from "./services/understand";
 import { evaluate } from "./services/eligibility";
 import {
   createSpeechRecognizer,
   speakText,
   stopSpeaking,
 } from "./services/voice";
+import { DEMO_SCENARIOS, type DemoScenario } from "./data/demoScenarios";
 import type { StateCode, Situation, ChildOrder } from "./types";
 import {
   RotateCcw,
@@ -22,10 +25,15 @@ import {
   ExternalLink,
   ChevronRight,
   Info,
+  HelpCircle,
+  PlayCircle,
+  Radio,
 } from "lucide-react";
 
 export const App: React.FC = () => {
   const [state, dispatch] = useReducer(conversationReducer, initialState);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   // Helper to pronounce prompts automatically on screen entry
@@ -43,7 +51,7 @@ export const App: React.FC = () => {
     };
   }, [state.step, state.currentSlot]);
 
-  // Read prompt on screen entry
+  // Read prompt aloud on screen entry
   useEffect(() => {
     switch (state.step) {
       case "GREETING_AND_SAFETY":
@@ -96,8 +104,68 @@ export const App: React.FC = () => {
         }
         break;
       }
+      case "HANDOFF_CARD": {
+        const res = evaluate(state.profile);
+        if (res.verdict === "LIKELY_ELIGIBLE") {
+          speakCurrentPrompt(
+            t(state.lang, "result_likely_eligible", { amount: res.amountInr || 5000 })
+          );
+        } else {
+          speakCurrentPrompt(t(state.lang, "ask_worker_to_confirm"));
+        }
+        break;
+      }
     }
   }, [state.step, state.currentSlot, state.pendingSlot, state.discoveryIndex, state.lang, speakCurrentPrompt, state.profile]);
+
+  // Process any speech transcript through the understand service
+  const handleTranscript = async (transcript: string) => {
+    dispatch({ type: "SET_TRANSCRIPT", payload: transcript });
+    dispatch({ type: "SET_LISTENING", payload: false });
+    dispatch({ type: "SET_AI_STATUS", payload: "evaluating" });
+
+    // Call understandSpeech (8s timeout, semantic validation, silent fallback)
+    const result = await understandSpeech(state.lang, state.currentSlot, transcript);
+
+    if (result.source === "live") {
+      dispatch({ type: "SET_AI_STATUS", payload: "live" });
+    } else {
+      dispatch({ type: "SET_AI_STATUS", payload: "offline" });
+    }
+
+    if (state.currentSlot && result.slots[state.currentSlot] !== undefined) {
+      const val = result.slots[state.currentSlot];
+      let displayVal = String(val);
+
+      if (state.currentSlot === "intent") {
+        displayVal = t(state.lang, `intent_${val}`);
+      } else if (state.currentSlot === "state") {
+        displayVal = t(state.lang, `state_${val}_native`);
+      } else if (state.currentSlot === "situation") {
+        displayVal = t(state.lang, `situation_${val}`);
+      } else if (state.currentSlot === "childOrder") {
+        displayVal = t(state.lang, `child_order_${val}`);
+      } else if (typeof val === "boolean") {
+        displayVal = val ? t(state.lang, "yes") : t(state.lang, "no");
+      }
+
+      dispatch({
+        type: "PROPOSE_SLOT",
+        payload: {
+          key: state.currentSlot,
+          value: val,
+          displayValue: displayVal,
+        },
+      });
+    } else {
+      // Unrecognized -> increment fail count
+      dispatch({
+        type: "RECORD_FAILED_ATTEMPT",
+        payload: state.currentSlot || "general",
+      });
+      speakCurrentPrompt(t(state.lang, "try_again"));
+    }
+  };
 
   // Setup Voice Recognizer
   const startListening = () => {
@@ -121,44 +189,7 @@ export const App: React.FC = () => {
     const recognizer = createSpeechRecognizer(
       state.lang,
       (transcript) => {
-        dispatch({ type: "SET_TRANSCRIPT", payload: transcript });
-        dispatch({ type: "SET_LISTENING", payload: false });
-
-        // Parse transcript with zero AI local parser
-        const parsed = localParse(state.currentSlot, transcript, state.lang);
-
-        if (state.currentSlot && parsed[state.currentSlot] !== undefined) {
-          const val = parsed[state.currentSlot];
-          let displayVal = String(val);
-
-          if (state.currentSlot === "intent") {
-            displayVal = t(state.lang, `intent_${val}`);
-          } else if (state.currentSlot === "state") {
-            displayVal = t(state.lang, `state_${val}_native`);
-          } else if (state.currentSlot === "situation") {
-            displayVal = t(state.lang, `situation_${val}`);
-          } else if (state.currentSlot === "childOrder") {
-            displayVal = t(state.lang, `child_order_${val}`);
-          } else if (typeof val === "boolean") {
-            displayVal = val ? t(state.lang, "yes") : t(state.lang, "no");
-          }
-
-          dispatch({
-            type: "PROPOSE_SLOT",
-            payload: {
-              key: state.currentSlot,
-              value: val,
-              displayValue: displayVal,
-            },
-          });
-        } else {
-          // Unrecognized utterance -> gentle repeat / increment attempts
-          dispatch({
-            type: "RECORD_FAILED_ATTEMPT",
-            payload: state.currentSlot || "general",
-          });
-          speakCurrentPrompt(t(state.lang, "try_again"));
-        }
+        handleTranscript(transcript);
       },
       (err) => {
         console.warn("Speech recognition error:", err);
@@ -190,6 +221,15 @@ export const App: React.FC = () => {
     });
   };
 
+  // Demo step simulator
+  const stepDemo = () => {
+    if (!state.demoScenario) return;
+    const currentStep = state.demoScenario.steps.find((s) => s.slot === state.currentSlot);
+    if (currentStep) {
+      handleTranscript(currentStep.utterance);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-black flex flex-col justify-between p-3 sm:p-5 max-w-lg mx-auto select-none">
       {/* Top Header */}
@@ -209,7 +249,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => dispatch({ type: "START_OVER" })}
-              className="p-2 border-2 border-black rounded-xl bg-white shadow-brutal-sm active:translate-x-0.5 active:translate-y-0.5"
+              className="p-2 border-2 border-black rounded-xl bg-white shadow-brutal-sm active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
               aria-label={t(state.lang, "start_again")}
               title={t(state.lang, "start_again")}
             >
@@ -218,6 +258,23 @@ export const App: React.FC = () => {
           )}
         </div>
       </header>
+
+      {/* Demo Floating Banner */}
+      {state.demoMode && state.demoScenario && (
+        <div className="bg-[#FFD600] border-2 border-black rounded-2xl p-2.5 my-2 shadow-brutal-sm flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-black truncate">
+            <Radio className="w-4 h-4 text-red-600 animate-pulse flex-shrink-0" />
+            <span className="truncate">Demo: {state.demoScenario.title}</span>
+          </div>
+          <button
+            type="button"
+            onClick={stepDemo}
+            className="bg-black text-white px-3 py-1 rounded-xl text-xs font-extrabold flex-shrink-0 shadow-brutal-pressed active:scale-95 cursor-pointer"
+          >
+            Auto-Speak Next ❯
+          </button>
+        </div>
+      )}
 
       {/* Main Single-Screen Content Area */}
       <main className="flex-1 flex flex-col justify-center items-center py-4 sm:py-6 w-full">
@@ -544,7 +601,7 @@ export const App: React.FC = () => {
                 {[18, 19, 20, 22, 24, 26, 28, 30, 32].map((num) => (
                   <BigButton
                     key={num}
-                    variant={num >= 19 ? "white" : "white"}
+                    variant="white"
                     className="text-2xl font-black"
                     onClick={() =>
                       handlePropose("age", num, `${num} ${t(state.lang, "ask_age") ? "years" : ""}`)
@@ -750,9 +807,9 @@ export const App: React.FC = () => {
             return (
               <BigButton
                 variant="yellow"
-                onClick={() => dispatch({ type: "START_OVER" })}
+                onClick={() => dispatch({ type: "GO_TO_HANDOFF" })}
               >
-                {t(state.lang, "start_again")}
+                {t(state.lang, "continue")}
               </BigButton>
             );
           }
@@ -789,13 +846,39 @@ export const App: React.FC = () => {
               >
                 {state.discoveryIndex + 1 < state.discoveryList.length
                   ? t(state.lang, "next")
-                  : t(state.lang, "done")}
+                  : t(state.lang, "continue")}
               </BigButton>
             </div>
           );
         })()}
 
-        {/* SCREEN 9: DONE */}
+        {/* SCREEN 9: LAST-MILE HANDOFF CARD */}
+        {state.step === "HANDOFF_CARD" && (() => {
+          const evalRes = evaluate(state.profile);
+          const activeDiscovery =
+            state.discoveryList.length > 0
+              ? state.discoveryList[state.discoveryIndex] || state.discoveryList[0]
+              : undefined;
+
+          const title =
+            state.profile.intent === "pregnant_or_nursing"
+              ? "Pradhan Mantri Matru Vandana Yojana (PMMVY)"
+              : activeDiscovery?.name || "Welfare Support";
+
+          return (
+            <HandoffCard
+              lang={state.lang}
+              schemeTitle={title}
+              eligibilityResult={
+                state.profile.intent === "pregnant_or_nursing" ? evalRes : undefined
+              }
+              discoveryScheme={activeDiscovery}
+              onRestart={() => dispatch({ type: "START_OVER" })}
+            />
+          );
+        })()}
+
+        {/* SCREEN 10: DONE */}
         {state.step === "DONE" && (
           <div className="w-full flex flex-col gap-6 items-center">
             <Card className="w-full text-center">
@@ -824,16 +907,41 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Footer strictly for judges and dev links */}
+      {/* Footer strictly for judges, demo mode, and dev links */}
       <footer className="text-xs text-gray-600 border-t-2 border-black pt-2 text-center flex flex-col gap-1.5 select-none">
         <div className="flex items-center justify-between text-[11px] font-bold">
-          <span className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-gray-400 border border-black inline-block"></span>
-            AI: offline (local rules engine)
+          <span className="flex items-center gap-1.5">
+            <span
+              className={`w-2.5 h-2.5 rounded-full border border-black inline-block ${
+                state.aiStatus === "live"
+                  ? "bg-green-500 animate-pulse"
+                  : state.aiStatus === "evaluating"
+                  ? "bg-yellow-400 animate-spin"
+                  : "bg-gray-400"
+              }`}
+            />
+            AI: {state.aiStatus}
           </span>
-          <span className="text-gray-500">
-            {state.speechSupported ? "Mic: Ready" : "Mic: Tap Fallback"}
-          </span>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsDemoModalOpen(true)}
+              className="underline font-bold text-amber-900 flex items-center gap-1 hover:text-black cursor-pointer"
+            >
+              <PlayCircle className="w-3.5 h-3.5" />
+              Demo Mode
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsAboutOpen(true)}
+              className="underline font-bold text-gray-800 flex items-center gap-0.5 hover:text-black cursor-pointer"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              About
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center justify-center gap-4 text-xs font-bold mt-0.5">
@@ -856,6 +964,51 @@ export const App: React.FC = () => {
           </a>
         </div>
       </footer>
+
+      {/* About Modal */}
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+
+      {/* Demo Mode Selection Modal */}
+      {isDemoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-3 sm:p-4">
+          <Card className="w-full max-w-md bg-[#FAFAFA] border-3 border-black shadow-brutal-lg p-5">
+            <div className="flex items-center justify-between mb-3 border-b-2 border-black pb-2">
+              <h2 className="text-xl font-black flex items-center gap-1.5">
+                <PlayCircle className="w-5 h-5 text-amber-600" />
+                Select Demo Scenario
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsDemoModalOpen(false)}
+                className="p-1 rounded-lg border-2 border-black bg-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs font-bold text-gray-700 mb-3">
+              Simulates voice responses using pre-scripted natural utterances. Runs 100% offline without mic, internet, or API key.
+            </p>
+
+            <div className="flex flex-col gap-2.5">
+              {DEMO_SCENARIOS.map((sc: DemoScenario) => (
+                <button
+                  key={sc.id}
+                  type="button"
+                  onClick={() => {
+                    dispatch({ type: "START_DEMO", payload: sc });
+                    setIsDemoModalOpen(false);
+                  }}
+                  className="text-left bg-white border-2 border-black rounded-2xl p-3 shadow-brutal-sm hover:bg-yellow-50 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                >
+                  <p className="font-extrabold text-sm text-black">{sc.title}</p>
+                  <p className="text-xs text-gray-600 font-semibold mt-0.5">{sc.subtitle}</p>
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
