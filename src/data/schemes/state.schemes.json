@@ -1,0 +1,216 @@
+{
+  "level": "state",
+  "note": "Two flagship women schemes per supported state. Every entry is discovery-only (deepFlow false). State schemes change often with governments; nothing here is shown as fact until verification.status is verified.",
+  "states": {
+    "TN": {
+      "name": "Tamil Nadu",
+      "schemes": [
+        {
+          "id": "tn_kmut",
+          "name": "Kalaignar Magalir Urimai Thogai Thittam",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹1,000 per month to the woman head of an eligible household",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Household income/asset limits apply; confirm them and the current name of the scheme." }
+        },
+        {
+          "id": "tn_pudhumai_penn",
+          "name": "Pudhumai Penn (Moovalur Ramamirtham Ammaiyar)",
+          "intents": ["girl_education"],
+          "benefit": "₹1,000 per month to girls who studied Class 6 to 12 in government schools and go on to higher education",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm institution types covered and any year-wise conditions." }
+        }
+      ]
+    },
+    "KA": {
+      "name": "Karnataka",
+      "schemes": [
+        {
+          "id": "ka_gruha_lakshmi",
+          "name": "Gruha Lakshmi",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹2,000 per month by DBT to the woman head of an eligible (APL/BPL) household",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm current eligibility exclusions (e.g. taxpayers, government employees)." }
+        },
+        {
+          "id": "ka_shakti",
+          "name": "Shakti",
+          "intents": ["free_travel"],
+          "benefit": "Free bus travel for women resident in Karnataka on state-run transport corporation buses",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "The source text said 'all' services. Free travel normally excludes some premium/AC services. Confirm exactly which services are covered before saying 'all buses'." }
+        }
+      ]
+    },
+    "MH": {
+      "name": "Maharashtra",
+      "schemes": [
+        {
+          "id": "mh_ladki_bahin",
+          "name": "Mukhyamantri Majhi Ladki Bahin Yojana",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹1,500 per month to eligible women aged 21 to 65 from families earning under ₹2.5 lakh a year",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Beneficiary lists have been re-verified and the amount has been politically debated. Confirm the current amount and who is still eligible." }
+        },
+        {
+          "id": "mh_lek_ladki",
+          "name": "Lek Ladki Yojana",
+          "intents": ["girl_child_savings", "girl_education"],
+          "benefit": "Staged cash support from birth through Class 12, ending in a lump sum when the girl turns 18",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm each stage amount and the total before quoting figures." }
+        }
+      ]
+    },
+    "MP": {
+      "name": "Madhya Pradesh",
+      "schemes": [
+        {
+          "id": "mp_ladli_behna",
+          "name": "Mukhyamantri Ladli Behna Yojana",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹1,250 to ₹1,500 per month to Aadhaar-linked accounts of married, widowed or abandoned women",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Amount has been raised in steps. Confirm the current monthly figure; do not quote a range." }
+        },
+        {
+          "id": "mp_ladli_laxmi",
+          "name": "Ladli Laxmi Yojana 2.0",
+          "intents": ["girl_child_savings", "girl_education"],
+          "benefit": "Education milestone incentives and a certificate maturing to over ₹1 lakh when the girl turns 21",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm the maturity amount and milestone schedule." }
+        }
+      ]
+    },
+    "WB": {
+      "name": "West Bengal",
+      "schemes": [
+        {
+          "id": "wb_lakshmir_bhandar",
+          "name": "Lakshmir Bhandar",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹1,000 per month (General) or ₹1,200 per month (SC/ST) to female household heads aged 25 to 60",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm current amounts and age band." }
+        },
+        {
+          "id": "wb_kanyashree",
+          "name": "Kanyashree Prakalpa",
+          "intents": ["girl_education"],
+          "benefit": "Annual scholarship (K1) and a one-time ₹25,000 grant (K2) for girls at 18 to delay marriage and support study",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm the K1 amount and K2 conditions (unmarried, still studying)." }
+        }
+      ]
+    },
+    "TS": {
+      "name": "Telangana",
+      "schemes": [
+        {
+          "id": "ts_mahalakshmi",
+          "name": "Mahalakshmi",
+          "intents": ["monthly_income_support", "free_travel"],
+          "benefit": "Free state bus travel for women; monthly cash of ₹2,500 to eligible women (status of the cash part unclear)",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "HIGH RISK. Free bus travel has been reported as in force since December 2023. Whether the ₹2,500 monthly cash is actually being paid is contradicted across sources I found (some say launched, some only promised). Show ONLY the bus benefit until the cash part is confirmed from a government source." }
+        },
+        {
+          "id": "ts_arogya_lakshmi",
+          "name": "Arogya Lakshmi",
+          "intents": ["pregnant_or_nursing"],
+          "benefit": "Daily nutrition support (meal, milk, eggs) for pregnant and lactating mothers through Anganwadis",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Good companion to PMMVY for Telangana users. Confirm current meal/egg entitlements." }
+        }
+      ]
+    },
+    "UP": {
+      "name": "Uttar Pradesh",
+      "schemes": [
+        {
+          "id": "up_kanya_sumangala",
+          "name": "Mukhyamantri Kanya Sumangala Yojana",
+          "intents": ["girl_child_savings", "girl_education"],
+          "benefit": "₹25,000 in conditional transfers across 6 milestones from birth to graduation admission",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm stage-wise amounts and family income limit." }
+        },
+        {
+          "id": "up_mahila_samarthya",
+          "name": "Mahila Samarthya Yojana (state)",
+          "intents": ["start_business"],
+          "benefit": "Capital and infrastructure support for women-led micro-enterprises and cottage units",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "The source text called this 'Mission Shakti', which is also the name of a central Ministry of WCD umbrella scheme. Do not mix them up. Confirm the exact state scheme name and terms." }
+        }
+      ]
+    },
+    "RJ": {
+      "name": "Rajasthan",
+      "schemes": [
+        {
+          "id": "rj_smartphone",
+          "name": "Indira Gandhi Smartphone Yojana",
+          "intents": ["digital_access"],
+          "benefit": "Subsidised smartphone with 3 years of internet for female heads of eligible families",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "HIGH RISK. Launched under an earlier state government and tied to the Chiranjeevi family programme. It may have been paused, renamed or discontinued. Do not show unless confirmed active." }
+        },
+        {
+          "id": "rj_rajshri",
+          "name": "Mukhyamantri Rajshri Yojana",
+          "intents": ["girl_child_savings", "girl_education"],
+          "benefit": "Cash assistance in 6 stages, up to ₹50,000, from birth to Class 12",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm it is still active and the stage amounts." }
+        }
+      ]
+    },
+    "AP": {
+      "name": "Andhra Pradesh",
+      "schemes": [
+        {
+          "id": "ap_sunna_vaddi",
+          "name": "YSR Sunna Vaddi (zero-interest loans for SHGs)",
+          "intents": ["shg_livelihood"],
+          "benefit": "State reimburses bank interest on micro-credit taken by women Self-Help Groups",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "HIGH RISK. Branded under a previous state government. Confirm whether it continues under this name or a successor. Do not show until confirmed." }
+        },
+        {
+          "id": "ap_thalliki_vandanam",
+          "name": "Thalliki Vandanam (formerly Jagananna Amma Vodi)",
+          "intents": ["child_school_support"],
+          "benefit": "₹15,000 per year to mothers' accounts to support children's school education",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "HIGH RISK. The source text merged two scheme names. Confirm current name, amount and conditions (e.g. school attendance, one child per family or all)." }
+        }
+      ]
+    },
+    "AS": {
+      "name": "Assam",
+      "schemes": [
+        {
+          "id": "as_orunodoi",
+          "name": "Orunodoi (3.0)",
+          "intents": ["monthly_income_support"],
+          "benefit": "₹1,250 per month by DBT to the woman of eligible poor households",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "Confirm current version number, amount and income limit." }
+        },
+        {
+          "id": "as_mmua",
+          "name": "Mukhya Mantri Mahila Udyamita Abhiyan (MMUA)",
+          "intents": ["start_business", "shg_livelihood"],
+          "benefit": "Grant and micro-credit of ₹10,000 to ₹25,000 for rural SHG women to start small village businesses",
+          "deepFlow": false,
+          "verification": { "status": "unverified", "lastVerified": null, "sourceUrl": null, "note": "The source text mentioned family-planning criteria. Confirm the real conditions and amounts before showing." }
+        }
+      ]
+    }
+  }
+}

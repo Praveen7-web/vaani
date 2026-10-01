@@ -1,0 +1,76 @@
+{
+  "level": "central",
+  "note": "Pan-India schemes. Only PMMVY has a deep eligibility flow in the MVP; the rest are discovery cards with a human handoff.",
+  "schemes": [
+    {
+      "id": "pmmvy",
+      "name": "Pradhan Mantri Matru Vandana Yojana (PMMVY)",
+      "department": "Ministry of Women & Child Development",
+      "intents": ["pregnant_or_nursing"],
+      "benefit": "₹5,000 for the first child in 2 instalments; ₹6,000 if the second child is a girl",
+      "deepFlow": true,
+      "verification": {
+        "status": "partially_verified",
+        "lastVerified": null,
+        "sourceUrl": null,
+        "note": "Amounts confirmed by several secondary sources. Official portal could not be reached. Disadvantaged-group criterion, age 19 and 270-day apply window need official confirmation."
+      }
+    },
+    {
+      "id": "lakhpati_didi",
+      "name": "Lakhpati Didi / DAY-NRLM",
+      "department": "Ministry of Rural Development",
+      "intents": ["shg_livelihood"],
+      "benefit": "Self-Help Group membership, collateral-free credit and skill training, aiming at ₹1,00,000+ annual household income",
+      "deepFlow": false,
+      "verification": {
+        "status": "unverified",
+        "lastVerified": null,
+        "sourceUrl": null,
+        "note": "A livelihood programme and target, not a fixed cash payout. Never describe it as a payment."
+      }
+    },
+    {
+      "id": "ssy",
+      "name": "Sukanya Samriddhi Yojana (SSY)",
+      "department": "Ministry of Finance",
+      "intents": ["girl_child_savings"],
+      "benefit": "Government savings account for a girl child with a high interest rate and tax benefit",
+      "deepFlow": false,
+      "verification": {
+        "status": "unverified",
+        "lastVerified": null,
+        "sourceUrl": null,
+        "note": "Interest rate is revised every quarter. Do NOT hard-code ~8.2%; say 'check the current rate at the post office or bank'. Opening age limit for the girl and 80C only under the old tax regime must be confirmed."
+      }
+    },
+    {
+      "id": "pmuy",
+      "name": "PM Ujjwala Yojana (PMUY)",
+      "department": "Ministry of Petroleum & Natural Gas",
+      "intents": ["cooking_fuel"],
+      "benefit": "Deposit-free LPG connection and cylinder refill subsidy",
+      "deepFlow": false,
+      "verification": {
+        "status": "unverified",
+        "lastVerified": null,
+        "sourceUrl": null,
+        "note": "Household eligibility conditions and current subsidy per cylinder must be confirmed. Do not state a subsidy amount until verified."
+      }
+    },
+    {
+      "id": "standup_india",
+      "name": "Stand-Up India",
+      "department": "Ministry of Finance",
+      "intents": ["start_business"],
+      "benefit": "Bank loans from ₹10 lakh up to ₹1 crore for new (greenfield) women-led businesses",
+      "deepFlow": false,
+      "verification": {
+        "status": "unverified",
+        "lastVerified": null,
+        "sourceUrl": null,
+        "note": "Confirm the scheme is still accepting applications and that the loan range is unchanged."
+      }
+    }
+  ]
+}
