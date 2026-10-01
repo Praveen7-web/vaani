@@ -6,6 +6,7 @@ import {
 import { BigButton, Card, MicButton, Badge } from "./components/ui";
 import { HandoffCard } from "./components/HandoffCard";
 import { AboutModal } from "./components/AboutModal";
+import vaaniWomanImg from "./assets/vaani-woman.png";
 import { t } from "./services/i18n";
 import { understandSpeech } from "./services/understand";
 import { evaluate } from "./services/eligibility";
@@ -334,20 +335,36 @@ export const App: React.FC = () => {
       <main className="flex-1 flex flex-col justify-center items-center py-4 sm:py-6 w-full">
         {/* SCREEN 1: LANGUAGE PICK */}
         {state.step === "LANGUAGE_PICK" && (
-          <div className="w-full flex flex-col gap-6 items-center">
-            <Card className="w-full text-center">
-              <h1 className="text-2xl sm:text-3xl font-extrabold mb-2">
-                अपनी भाषा चुनें / மொழி தேர்வு
+          <div className="w-full flex flex-col gap-3 sm:gap-4 items-center justify-center">
+            {/* 1. Woman Illustration */}
+            <div className="w-full flex justify-center items-center">
+              <img
+                src={vaaniWomanImg}
+                alt="Woman using Vaani"
+                className="h-28 sm:h-36 max-h-[24vh] w-auto object-contain drop-shadow-md"
+                loading="eager"
+              />
+            </div>
+
+            {/* 2. VAANI & 3. Government Scheme Help / Welcome Text */}
+            <Card className="w-full text-center py-2.5 px-3">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-wide uppercase mb-1">
+                VAANI
               </h1>
-              <p className="text-lg text-gray-700 font-semibold">
-                Choose your language to begin
+              <p className="text-xs sm:text-sm font-extrabold text-gray-800 leading-snug">
+                Government Scheme Help / सरकारी योजना सहायता / அரசு நலத்திட்ட வழிகாட்டி
+              </p>
+              <p className="text-xs font-semibold text-gray-600 mt-1">
+                अपनी भाषा चुनें • மொழி தேர்வு • Choose Language
               </p>
             </Card>
 
-            <div className="w-full flex flex-col gap-4">
+            {/* 4. Language Selection Buttons */}
+            <div className="w-full flex flex-col gap-2.5 sm:gap-3">
               <BigButton
                 size="large"
                 variant="yellow"
+                className="min-h-[50px] sm:min-h-[56px] text-base sm:text-lg font-black"
                 onClick={() => dispatch({ type: "SET_LANGUAGE", payload: "hi" })}
               >
                 🇮🇳 हिन्दी (Hindi)
@@ -355,6 +372,7 @@ export const App: React.FC = () => {
               <BigButton
                 size="large"
                 variant="yellow"
+                className="min-h-[50px] sm:min-h-[56px] text-base sm:text-lg font-black"
                 onClick={() => dispatch({ type: "SET_LANGUAGE", payload: "ta" })}
               >
                 🇮🇳 தமிழ் (Tamil)
@@ -362,6 +380,7 @@ export const App: React.FC = () => {
               <BigButton
                 size="large"
                 variant="white"
+                className="min-h-[50px] sm:min-h-[56px] text-base sm:text-lg font-black"
                 onClick={() => dispatch({ type: "SET_LANGUAGE", payload: "en" })}
               >
                 🌐 English
