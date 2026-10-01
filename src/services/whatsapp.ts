@@ -10,7 +10,7 @@ const DOC_LABELS: Record<Lang, Record<DocKey, string>> = {
   ta: {
     aadhaar: "ஆதார் கார்டு",
     bank_passbook: "வங்கி / அஞ்சலக பாஸ்புக்",
-    mother_child_card: "தாய் சேய் நல அட்டை (PICME/RCH)",
+    mother_child_card: "தாய் சேய் நல அட்டை (MCP)",
     photo: "பாஸ்போர்ட் அளவு புகைப்படம்",
   },
   en: {
@@ -38,10 +38,12 @@ export function buildWhatsAppMessage({
   schemeTitle,
   verdict,
   amount,
-  documents = ["aadhaar", "bank_passbook", "mother_child_card", "photo"],
+  documents = ["aadhaar", "bank_passbook", "mother_child_card"],
 }: WhatsAppMessageParams): string {
   const docTable = DOC_LABELS[lang] || DOC_LABELS.en;
-  const docList = documents.map((d) => `- ${docTable[d] || d}`).join("\n");
+  // Passport photo is not an official PMMVY portal document requirement (Aadhaar e-KYC is used)
+  const pmmvyDocs = documents.filter((d) => d !== "photo");
+  const docList = pmmvyDocs.map((d) => `- ${docTable[d] || d}`).join("\n");
 
   if (lang === "hi") {
     let msg = `वाणी — सरकारी योजना सहायता\n\n`;

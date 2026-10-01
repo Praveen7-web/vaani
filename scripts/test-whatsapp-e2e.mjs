@@ -21,8 +21,8 @@ console.log(`   Tamil:   "${taStrings.share_with_worker}"`);
 assert.strictEqual(taStrings.share_with_worker, "ASHA / குடும்பத்துடன் WhatsApp-ல் பகிரவும்");
 console.log("✔ Button text in all 3 languages matches requirements exactly.\n");
 
-// 2. Check PMMVY Flow -> WhatsApp Message in English
-console.log("2. Simulating English PMMVY Completion:");
+// 2. Check PMMVY Flow -> WhatsApp Message in English (First Child -> ₹5,000)
+console.log("2. Simulating English PMMVY Completion (First Child):");
 const pmmvyProfileEn = {
   intent: "pregnant_or_nursing",
   situation: "pregnant",
@@ -54,23 +54,24 @@ assert.ok(shareMsgEn.includes("Potential Benefit: ₹5,000"));
 assert.ok(shareMsgEn.includes("- Aadhaar Card"));
 assert.ok(shareMsgEn.includes("- Bank / Post Passbook"));
 assert.ok(shareMsgEn.includes("- Mother & Child Card (MCP)"));
-assert.ok(shareMsgEn.includes("- Passport Photos"));
+// Passport photos must NOT be in the message
+assert.doesNotMatch(shareMsgEn, /Passport Photo/i);
 assert.ok(shareMsgEn.includes("Next step:"));
 assert.ok(shareMsgEn.includes("Anganwadi Centre or ASHA worker"));
 // Verify NO PII
-assert.doesNotMatch(shareMsgEn, /\b\d{12}\b/); // No Aadhaar 12-digit numbers
+assert.doesNotMatch(shareMsgEn, /\b\d{12}\b/);
 assert.doesNotMatch(shareMsgEn, /password|otp|pin|secret/i);
 // Verify NO other languages
 assert.doesNotMatch(shareMsgEn, /[\u0900-\u097F]/);
 assert.doesNotMatch(shareMsgEn, /[\u0B80-\u0BFF]/);
 console.log("✔ English WhatsApp message matches all requirements.\n");
 
-// 3. Check PMMVY Flow -> WhatsApp Message in Hindi
-console.log("3. Simulating Hindi PMMVY Completion:");
+// 3. Check PMMVY Flow -> WhatsApp Message in Hindi (First Child -> ₹5,000)
+console.log("3. Simulating Hindi PMMVY Completion (First Child):");
 const pmmvyProfileHi = {
   intent: "pregnant_or_nursing",
   situation: "pregnant",
-  age: 24,
+  age: 22,
   childOrder: "first",
   govtEmployee: false,
   hasQualifyingCard: true,
@@ -98,27 +99,28 @@ assert.ok(shareMsgHi.includes("संभावित सहायता रा�
 assert.ok(shareMsgHi.includes("- आधार कार्ड"));
 assert.ok(shareMsgHi.includes("- बैंक / डाकघर पासबुक"));
 assert.ok(shareMsgHi.includes("- मातृ एवं शिशु सुरक्षा कार्ड (MCP)"));
-assert.ok(shareMsgHi.includes("- पासपोर्ट फोटो"));
+// Passport photos must NOT be in the message
+assert.doesNotMatch(shareMsgHi, /पासपोर्ट फोटो/);
 assert.ok(shareMsgHi.includes("अगला कदम:"));
 assert.ok(shareMsgHi.includes("आंगनवाड़ी केंद्र या आशा कार्यकर्ता"));
 assert.doesNotMatch(shareMsgHi, /[\u0B80-\u0BFF]/);
 console.log("✔ Hindi WhatsApp message matches all requirements.\n");
 
-// 4. Check PMMVY Flow -> WhatsApp Message in Tamil
-console.log("4. Simulating Tamil PMMVY Completion:");
+// 4. Check PMMVY Flow -> WhatsApp Message in Tamil (SAME First Child Scenario -> ₹5,000)
+console.log("4. Simulating Tamil PMMVY Completion (SAME First Child Scenario):");
 const pmmvyProfileTa = {
   intent: "pregnant_or_nursing",
   situation: "pregnant",
-  age: 25,
-  childOrder: "second",
-  secondChildIsGirl: true,
+  age: 22,
+  childOrder: "first",
   govtEmployee: false,
   hasQualifyingCard: true,
   hasBankOrPostAccount: true,
 };
 const evalTa = evaluate(pmmvyProfileTa);
 assert.strictEqual(evalTa.verdict, "LIKELY_ELIGIBLE");
-assert.strictEqual(evalTa.amountInr, 6000);
+// Deterministic engine must return ₹5,000 for the identical first child profile
+assert.strictEqual(evalTa.amountInr, 5000);
 
 const shareMsgTa = buildWhatsAppMessage({
   lang: "ta",
@@ -134,15 +136,17 @@ console.log("-----------------------------");
 assert.ok(shareMsgTa.includes("வாணி — அரசு நலத்திட்ட வழிகாட்டி"));
 assert.ok(shareMsgTa.includes("திட்டம்: பிரதம மந்திரி மாத்ரு வந்தனா யோஜனா (PMMVY)"));
 assert.ok(shareMsgTa.includes("தகுதி நிலை: இத்திட்டத்திற்கு நீங்கள் தகுதி பெற வாய்ப்புள்ளது."));
-assert.ok(shareMsgTa.includes("உத்தேச உதவித்தொகை: ₹6,000"));
+// Must say ₹5,000 for the first child
+assert.ok(shareMsgTa.includes("உத்தேச உதவித்தொகை: ₹5,000"));
 assert.ok(shareMsgTa.includes("- ஆதார் கார்டு"));
 assert.ok(shareMsgTa.includes("- வங்கி / அஞ்சலக பாஸ்புக்"));
-assert.ok(shareMsgTa.includes("- தாய் சேய் நல அட்டை (PICME/RCH)"));
-assert.ok(shareMsgTa.includes("- பாஸ்போர்ட் அளவு புகைப்படம்"));
+assert.ok(shareMsgTa.includes("- தாய் சேய் நல அட்டை (MCP)"));
+// Passport photos must NOT be in the message
+assert.doesNotMatch(shareMsgTa, /பாஸ்போர்ட் அளவு புகைப்படம்/);
 assert.ok(shareMsgTa.includes("அடுத்த கட்ட நடவடிக்கை:"));
 assert.ok(shareMsgTa.includes("அங்கன்வாடி மையம் அல்லது ஆஷா பணியாளரை"));
 assert.doesNotMatch(shareMsgTa, /[\u0900-\u097F]/);
-console.log("✔ Tamil WhatsApp message matches all requirements.\n");
+console.log("✔ Tamil WhatsApp message matches all requirements (same ₹5,000 benefit & MCP naming).\n");
 
 // 5. Test Click-to-Chat URLs
 console.log("5. Testing WhatsApp Click-to-Chat URLs:");
@@ -184,5 +188,81 @@ const askMsgEn = buildWhatsAppMessage({
 assert.ok(askMsgEn.includes("Result: Please consult your Anganwadi worker to verify eligibility."));
 assert.ok(!askMsgEn.includes("Potential Benefit:"));
 console.log("✔ ASK_WORKER properly omits rupee promise and refers user to worker.\n");
+
+// 7. Verify Cross-Language Deterministic Parity (SAME scenario -> SAME amount)
+console.log("7. Verifying Cross-Language Deterministic Parity (SAME scenario -> SAME amount):");
+const scenarios = [
+  {
+    name: "1st Living Child",
+    profile: {
+      intent: "pregnant_or_nursing",
+      situation: "pregnant",
+      age: 22,
+      childOrder: "first",
+      govtEmployee: false,
+      hasQualifyingCard: true,
+      hasBankOrPostAccount: true,
+    },
+    expectedAmount: 5000,
+  },
+  {
+    name: "2nd Child (Girl)",
+    profile: {
+      intent: "pregnant_or_nursing",
+      situation: "pregnant",
+      age: 25,
+      childOrder: "second",
+      secondChildIsGirl: true,
+      govtEmployee: false,
+      hasQualifyingCard: true,
+      hasBankOrPostAccount: true,
+    },
+    expectedAmount: 6000,
+  },
+];
+
+for (const sc of scenarios) {
+  const evalResult = evaluate(sc.profile);
+  assert.strictEqual(
+    evalResult.amountInr,
+    sc.expectedAmount,
+    `${sc.name} must evaluate to ₹${sc.expectedAmount}`
+  );
+
+  const en = buildWhatsAppMessage({
+    lang: "en",
+    schemeTitle: "PMMVY",
+    verdict: evalResult.verdict,
+    amount: evalResult.amountInr,
+  });
+  const hi = buildWhatsAppMessage({
+    lang: "hi",
+    schemeTitle: "PMMVY",
+    verdict: evalResult.verdict,
+    amount: evalResult.amountInr,
+  });
+  const ta = buildWhatsAppMessage({
+    lang: "ta",
+    schemeTitle: "PMMVY",
+    verdict: evalResult.verdict,
+    amount: evalResult.amountInr,
+  });
+
+  const formattedAmount = `₹${sc.expectedAmount.toLocaleString("en-IN")}`;
+  assert.ok(
+    en.includes(formattedAmount),
+    `English message must contain ${formattedAmount} for ${sc.name}`
+  );
+  assert.ok(
+    hi.includes(formattedAmount),
+    `Hindi message must contain ${formattedAmount} for ${sc.name}`
+  );
+  assert.ok(
+    ta.includes(formattedAmount),
+    `Tamil message must contain ${formattedAmount} for ${sc.name}`
+  );
+  console.log(`   ✔ ${sc.name}: EN, HI, and TA all contain ${formattedAmount} identically.`);
+}
+console.log("✔ Verified: Benefit amounts are never hardcoded by language and strictly originate from deterministic rule engine.\n");
 
 console.log("ALL WHATSAPP INTEGRATION TESTS PASSED SUCCESSFULLY! 🎉\n");

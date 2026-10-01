@@ -122,6 +122,7 @@ assert.match(enMsg, /Scheme: Pradhan Mantri Matru Vandana Yojana/, "English mess
 assert.match(enMsg, /Result: You may qualify for this scheme\./, "English message must use safe 'you may qualify' phrasing");
 assert.match(enMsg, /Potential Benefit: ₹5,000/, "English message must format amount");
 assert.match(enMsg, /Aadhaar Card/, "English message must include documents");
+assert.doesNotMatch(enMsg, /Passport Photo/i, "Passport photo must not be included in WhatsApp message");
 assert.match(enMsg, /Next step:\n.*Anganwadi Centre or ASHA worker/, "English message must include Anganwadi/ASHA next step");
 assert.doesNotMatch(enMsg, /[\u0900-\u097F]/, "English message must not contain Hindi script");
 assert.doesNotMatch(enMsg, /[\u0B80-\u0BFF]/, "English message must not contain Tamil script");
@@ -141,6 +142,7 @@ assert.match(hiMsg, /योजना: प्रधानमंत्री म�
 assert.match(hiMsg, /परिणाम: आप इस योजना के लिए पात्र हो सकती हैं।/, "Hindi message must use safe phrasing");
 assert.match(hiMsg, /संभावित सहायता राशि: ₹5,000/, "Hindi message must include amount");
 assert.match(hiMsg, /आधार कार्ड/, "Hindi message must include documents in Hindi");
+assert.doesNotMatch(hiMsg, /पासपोर्ट फोटो/, "Passport photo must not be included in Hindi WhatsApp message");
 assert.match(hiMsg, /अगला कदम:\n.*आंगनवाड़ी केंद्र या आशा कार्यकर्ता/, "Hindi message must include Anganwadi/ASHA next step");
 assert.doesNotMatch(hiMsg, /[\u0B80-\u0BFF]/, "Hindi message must not contain Tamil script");
 assert.match(hiMsg, /[\u0900-\u097F]/, "Hindi message must contain Hindi script");
@@ -159,6 +161,8 @@ assert.match(taMsg, /திட்டம்: பிரதம மந்திர�
 assert.match(taMsg, /தகுதி நிலை: இத்திட்டத்திற்கு நீங்கள் தகுதி பெற வாய்ப்புள்ளது\./, "Tamil message must use safe phrasing");
 assert.match(taMsg, /உத்தேச உதவித்தொகை: ₹5,000/, "Tamil message must include amount");
 assert.match(taMsg, /ஆதார் கார்டு/, "Tamil message must include documents in Tamil");
+assert.match(taMsg, /தாய் சேய் நல அட்டை \(MCP\)/, "Tamil message must use consistent MCP card terminology");
+assert.doesNotMatch(taMsg, /பாஸ்போர்ட் அளவு புகைப்படம்/, "Passport photo must not be included in Tamil WhatsApp message");
 assert.match(taMsg, /அடுத்த கட்ட நடவடிக்கை:\n.*அங்கன்வாடி மையம் அல்லது ஆஷா பணியாளரை/, "Tamil message must include Anganwadi/ASHA next step");
 assert.doesNotMatch(taMsg, /[\u0900-\u097F]/, "Tamil message must not contain Hindi script");
 assert.match(taMsg, /[\u0B80-\u0BFF]/, "Tamil message must contain Tamil script");

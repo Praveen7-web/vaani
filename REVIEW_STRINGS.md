@@ -58,7 +58,7 @@ This document lists every user-facing string in **English**, **Hindi (हिन�
 | `result_not_govt_employee` | Women in regular government or PSU employment are not eligible for PMMVY cash assistance. | नियमित सरकारी सेवा में कार्यरत महिलाएँ इस नकद सहायता के लिए पात्र नहीं हैं। | நிரந்தர அரசுப் பணியில் உள்ளவர்கள் இத்திட்டத்தின் கீழ் பணப்பலன் பெற முடியாது. |
 | `doc_aadhaar` | Aadhaar Card | आधार कार्ड | ஆதார் கார்டு |
 | `doc_bank_passbook` | Bank / Post Passbook | बैंक / डाकघर पासबुक | வங்கி / அஞ்சலக பாஸ்புக் |
-| `doc_mother_child_card` | Mother & Child Card (MCP) | मातृ एवं शिशु सुरक्षा कार्ड (MCP) | தாய் சேய் நல அட்டை (PICME/RCH) |
+| `doc_mother_child_card` | Mother & Child Card (MCP) | मातृ एवं शिशु सुरक्षा कार्ड (MCP) | தாய் சேய் நல அட்டை (MCP) |
 | `doc_photo` | Passport Photos | पासपोर्ट फोटो | பாஸ்போர்ட் அளவு புகைப்படம் |
 | `go_to_anganwadi` | Find Nearest Anganwadi Centre | नजदीकी आंगनवाड़ी केंद्र का पता करें | அருகிலுள்ள அங்கன்வாடி மையம் செல்ல வழிகாட்டுக |
 | `call_181` | Call 181 Women's Helpline | महिला हेल्पलाइन 181 पर कॉल करें | பெண்கள் உதவி எண் 181-ஐ அழைக்க |

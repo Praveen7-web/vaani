@@ -39,13 +39,14 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
     "photo",
   ];
   const needsAccountHelp = eligibilityResult?.needsAccountHelp ?? false;
+  const whatsappDocs = docs.filter((d) => d !== "photo");
 
   const whatsappUrl = getWhatsAppShareUrl({
     lang,
     schemeTitle,
     verdict: eligibilityResult?.verdict,
     amount,
-    documents: docs,
+    documents: whatsappDocs,
   });
 
   const handleCopy = async () => {
@@ -55,7 +56,7 @@ export const HandoffCard: React.FC<HandoffCardProps> = ({
         schemeTitle,
         verdict: eligibilityResult?.verdict,
         amount,
-        documents: docs,
+        documents: whatsappDocs,
       });
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(rawText);
